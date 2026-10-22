@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.aicode.directtcp.net.CaptureBus
 import com.aicode.directtcp.net.CaptureEvent
 import com.aicode.directtcp.net.ScanResult
+import com.aicode.directtcp.net.SendTemplate
 import com.aicode.directtcp.net.Sender
 import com.aicode.directtcp.net.SessionScanner
 import com.aicode.directtcp.net.TcpSession
@@ -110,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         spinnerTemplate.adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
-            Template.entries.map { it.label },
+            SendTemplate.entries.map { it.label },
         )
 
         btnConnect.setOnClickListener { connect() }
@@ -254,7 +255,7 @@ class MainActivity : AppCompatActivity() {
             toast("先输入要发送的内容")
             return
         }
-        val template = Template.entries[spinnerTemplate.selectedItemPosition]
+        val template = SendTemplate.entries[spinnerTemplate.selectedItemPosition]
         val payload = template.build(text)
         if (payload == null || payload.isEmpty()) {
             log("内容无法编码（HEX 模式需要偶数字节，如 48 65 6c）")
@@ -374,30 +375,5 @@ class MainActivity : AppCompatActivity() {
         val lines = merged.split('\n')
         tvLog.text = if (lines.size > 400) lines.takeLast(400).joinToString("\n") else merged
         scrollLog.post { scrollLog.fullScroll(View.FOCUS_DOWN) }
-    }
-
-    enum class Template(val label: String, val build: (String) -> ByteArray?) {
-        TEXT_LF("文本 + \\n", { (it + "\n").toByteArray(Charsets.UTF_8) }),
-        TEXT_CRLF("文本 + \\r\\n", { (it + "\r\n").toByteArray(Charsets.UTF_8) }),
-        TEXT_RAW("文本无行尾", { it.toByteArray(Charsets.UTF_8) }),
-        JSON_LF("JSON 行", {
-            val escaped = it.replace("\\", "\\\\").replace("\"", "\\\"")
-            "{\"text\":\"$escaped\"}\n".toByteArray(Charsets.UTF_8)
-        }),
-        HEX("HEX 字节", { hexToBytes(it) });
-
-        companion object {
-            fun hexToBytes(input: String): ByteArray? {
-                val clean = input.replace(Regex("[\\s,:]"), "")
-                if (clean.isEmpty() || clean.length % 2 != 0) return null
-                return try {
-                    ByteArray(clean.length / 2) {
-                        clean.substring(it * 2, it * 2 + 2).toInt(16).toByte()
-                    }
-                } catch (e: Exception) {
-                    null
-                }
-            }
-        }
     }
 }
