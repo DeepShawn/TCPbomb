@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">直连投递</string>
+    <string name="app_subtitle">抓对端地址 · 免配对直接发</string>
+
+    <string name="status_idle">先点「抓取对端」，或直接填 IP:端口</string>
+    <string name="hint_host">对端 IP</string>
+    <string name="hint_port">端口</string>
+    <string name="connect">连接</string>
+    <string name="disconnect">断开</string>
+    <string name="capture">抓取对端</string>
+    <string name="history">历史</string>
+    <string name="scan">扫描会话</string>
+    <string name="hint_message">要发送的内容</string>
+    <string name="send">发送</string>
+</resources>
